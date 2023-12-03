@@ -33,25 +33,6 @@
         }
       ],
       "type": "prompt"
-    },
-    {
-      "alignment": "left",
-      "newline": true,
-      "segments": [
-        {
-          "foreground": "#cd5e42",
-          "style": "plain",
-          "template": "\ue3bf ",
-          "type": "root"
-        },
-        {
-          "foreground": "#CD4277",
-          "style": "plain",
-          "template": "# ",
-          "type": "text"
-        }
-      ],
-      "type": "prompt"
     }
   ],
   "version": 2
