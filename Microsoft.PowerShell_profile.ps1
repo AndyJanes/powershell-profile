@@ -14,30 +14,29 @@
 ### more information about execution policies, run Get-Help about_Execution_Policies.
 
 #check for updates
-try{
-    $url = "https://raw.githubusercontent.com/ChrisTitusTech/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
-    $oldhash = Get-FileHash $PROFILE
-    Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
-    $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
-    if ($newhash -ne $oldhash) {
-        Get-Content "$env:temp/Microsoft.PowerShell_profile.ps1" | Set-Content $PROFILE
+#try{
+#    $url = "https://raw.githubusercontent.com/ChrisTitusTech/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
+#    $oldhash = Get-FileHash $PROFILE
+#    Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
+#    $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
+#    if ($newhash -ne $oldhash) {
+#        Get-Content "$env:temp/Microsoft.PowerShell_profile.ps1" | Set-Content $PROFILE
         . $PROFILE
-        return
-    }
-}
-catch {
-    Write-Error "unable to check for `$profile updates"
-}
-Remove-Variable @("newhash", "oldhash", "url")
-Remove-Item  "$env:temp/Microsoft.PowerShell_profile.ps1"
+#        return
+ #   }
+#}
+#catch {
+#    Write-Error "unable to check for `$profile updates"
+#}
+#Remove-Variable @("newhash", "oldhash", "url")
+#Remove-Item  "$env:temp/Microsoft.PowerShell_profile.ps1"
 
 # Import Terminal Icons
 Import-Module -Name Terminal-Icons
 
-# Find out if the current user identity is elevated (has admin rights)
-$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-$principal = New-Object Security.Principal.WindowsPrincipal $identity
-$isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+# Run Oh-my-posh themeing app
+oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/AndyJanes/powershell-profile/main/ohmyposhtheme.omp.json' | Invoke-Expression
+
 
 # If so and the current host is a command line, then change to red color 
 # as warning to user that they are operating in an elevated context
@@ -64,16 +63,6 @@ if (Test-Path "$env:USERPROFILE\Work Folders") {
     function Work: { Set-Location Work: }
 }
 
-# Set up command prompt and window title. Use UNIX-style convention for identifying 
-# whether user is elevated (root) or not. Window title shows current version of PowerShell
-# and appends [ADMIN] if appropriate for easy taskbar identification
-function prompt { 
-    if ($isAdmin) {
-        "[" + (Get-Location) + "] # " 
-    } else {
-        "[" + (Get-Location) + "] $ "
-    }
-}
 
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}" -f $PSVersionTable.PSVersion.ToString()
 if ($isAdmin) {
@@ -116,10 +105,6 @@ function Edit-Profile {
     }
 }
 
-# We don't need these any more; they were just temporary variables to get to $isAdmin. 
-# Delete them to prevent cluttering up the user profile. 
-Remove-Variable identity
-Remove-Variable principal
 
 Function Test-CommandExists {
     Param ($command)
@@ -223,19 +208,3 @@ function pkill($name) {
 function pgrep($name) {
     Get-Process $name
 }
-
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-# Be aware that if you are missing these lines from your profile, tab completion
-# for `choco` will not function.
-# See https://ch0.co/tab-completion for details.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
-}
-
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
-
-
-## Final Line to set prompt
-oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json | Invoke-Expression
